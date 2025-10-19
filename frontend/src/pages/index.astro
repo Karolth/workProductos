@@ -1,11 +1,24 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import ProductGrid from '../components/ProductGrid.astro';
+import Footer from '../components/Footer.astro';
+import { ProductoService } from '../services/api';
+import type { Producto } from '../types/producto';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Obtener productos del backend
+let productos: Producto[] = [];
+try {
+  productos = await ProductoService.getAll();
+} catch (error) {
+  console.error('Error al cargar productos:', error);
+}
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Inicio - Productos" description="Descubre nuestra colección de productos de calidad">
+  <Header />
+  <Hero />
+  <ProductGrid productos={productos} />
+  <Footer />
 </Layout>

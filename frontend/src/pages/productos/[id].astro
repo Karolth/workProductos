@@ -1,0 +1,266 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { ProductoService } from '../../services/api';
+import type { Producto } from '../../types/producto';
+
+const { id } = Astro.params;
+
+let producto: Producto | null = null;
+try {
+  producto = await ProductoService.getById(Number(id));
+} catch (error) {
+  console.error('Error al cargar producto:', error);
+}
+
+if (!producto) {
+  return Astro.redirect('/');
+}
+---
+
+<Layout title={`${producto.nombre} - Productos`}>
+  <Header />
+  
+  <main class="product-detail">
+    <div class="container">
+      <a href="/" class="back-link">← Volver a productos</a>
+      
+      <div class="product-content">
+        <div class="product-image-large">
+          <span class="product-emoji-large">🥤</span>
+          {producto.catidades < 10 && (
+            <span class="badge badge-low">Pocas unidades</span>
+          )}
+        </div>
+        
+        <div class="product-details">
+          <h1 class="product-title">{producto.nombre}</h1>
+          
+          <div class="product-meta">
+            <div class="meta-item">
+              <span class="meta-label">ID del Producto</span>
+              <span class="meta-value">#{producto.idProductos}</span>
+            </div>
+          </div>
+          
+          <div class="product-description-section">
+            <h3>Descripción</h3>
+            <p>{producto.descripcion}</p>
+          </div>
+          
+          <div class="product-info-grid">
+            <div class="info-card">
+              <span class="info-icon">💰</span>
+              <div>
+                <p class="info-label">Precio</p>
+                <p class="info-value">${producto.precio.toFixed(2)}</p>
+              </div>
+            </div>
+            
+            <div class="info-card">
+              <span class="info-icon">📦</span>
+              <div>
+                <p class="info-label">Stock Disponible</p>
+                <p class="info-value">{producto.catidades} unidades</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="product-actions-section">
+            <button class="btn btn-add-cart">
+              🛒 Agregar al Carrito
+            </button>
+            <a href="/admin" class="btn btn-secondary">
+              ✏️ Editar Producto
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <Footer />
+</Layout>
+
+<style>
+  .product-detail {
+    padding: 60px 0;
+    min-height: 70vh;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 30px;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  .product-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    background: var(--white);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+
+  .product-image-large {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .product-emoji-large {
+    font-size: 200px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .badge-low {
+    background: #ff6b6b;
+    color: white;
+  }
+
+  .product-details {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .product-title {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .product-meta {
+    display: flex;
+    gap: 20px;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meta-label {
+    font-size: 12px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .meta-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .product-description-section h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .product-description-section p {
+    color: var(--text-light);
+    line-height: 1.8;
+    font-size: 16px;
+  }
+
+  .product-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .info-card {
+    background: var(--bg);
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .info-icon {
+    font-size: 36px;
+  }
+
+  .info-label {
+    font-size: 13px;
+    color: var(--text-light);
+    margin: 0;
+  }
+
+  .info-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .product-actions-section {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .btn-add-cart {
+    flex: 1;
+  }
+
+  @media (max-width: 968px) {
+    .product-content {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .product-image-large {
+      height: 350px;
+    }
+
+    .product-emoji-large {
+      font-size: 150px;
+    }
+
+    .product-title {
+      font-size: 32px;
+    }
+
+    .product-actions-section {
+      flex-direction: column;
+    }
+  }
+</style>
