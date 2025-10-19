@@ -1,0 +1,649 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { ProductoService } from '../../services/api';
+import type { Producto } from '../../types/producto';
+
+// Cargar productos inicialmente
+let productos: Producto[] = [];
+try {
+  productos = await ProductoService.getAll();
+} catch (error) {
+  console.error('Error al cargar productos:', error);
+}
+---
+
+<Layout title="Panel de Administración - Productos">
+  <Header />
+  
+  <main class="admin-panel">
+    <div class="container">
+      <div class="admin-header">
+        <h1>
+          <span class="admin-icon">⚙️</span>
+          Panel de Administración
+        </h1>
+        <p class="admin-subtitle">Gestiona tus productos fácilmente</p>
+      </div>
+
+      <!-- Formulario para crear/editar producto -->
+      <div class="form-section">
+        <h2 id="form-title">➕ Agregar Nuevo Producto</h2>
+        
+        <form id="product-form" class="product-form">
+          <input type="hidden" id="product-id" value="">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="nombre">Nombre del Producto *</label>
+              <input 
+                type="text" 
+                id="nombre" 
+                name="nombre" 
+                required 
+                placeholder="Ej: Refresco de Limón"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="precio">Precio ($) *</label>
+              <input 
+                type="number" 
+                id="precio" 
+                name="precio" 
+                step="0.01" 
+                min="0" 
+                required 
+                placeholder="0.00"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="catidades">Cantidad en Stock *</label>
+              <input 
+                type="number" 
+                id="catidades" 
+                name="catidades" 
+                min="0" 
+                required 
+                placeholder="0"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="descripcion">Descripción *</label>
+            <textarea 
+              id="descripcion" 
+              name="descripcion" 
+              rows="4" 
+              required
+              placeholder="Describe tu producto..."
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-submit" id="submit-btn">
+              💾 Guardar Producto
+            </button>
+            <button type="button" class="btn btn-cancel" id="cancel-btn" style="display: none;">
+              ❌ Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tabla de productos -->
+      <div class="table-section">
+        <div class="table-header">
+          <h2>📦 Lista de Productos</h2>
+          <span class="product-count" id="product-count">{productos.length} productos</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="products-table" id="products-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody">
+              {productos.length === 0 ? (
+                <tr>
+                  <td colspan="6" class="empty-row">
+                    <div class="empty-state-small">
+                      <span>📭</span>
+                      <p>No hay productos registrados</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                productos.map((producto) => (
+                  <tr data-id={producto.idProductos}>
+                    <td>{producto.idProductos}</td>
+                    <td class="product-name">{producto.nombre}</td>
+                    <td class="product-desc">{producto.descripcion}</td>
+                    <td class="product-price">${producto.precio.toFixed(2)}</td>
+                    <td>
+                      <span class={`stock-badge ${producto.catidades < 10 ? 'stock-low' : 'stock-ok'}`}>
+                        {producto.catidades}
+                      </span>
+                    </td>
+                    <td class="actions-cell">
+                      <button 
+                        class="btn-action btn-edit" 
+                        data-id={producto.idProductos}
+                        title="Editar"
+                      >
+                        ✏️
+                      </button>
+                      <button 
+                        class="btn-action btn-delete" 
+                        data-id={producto.idProductos}
+                        title="Eliminar"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .admin-panel {
+    padding: 60px 0;
+    min-height: 80vh;
+    background: var(--bg);
+  }
+
+  .admin-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .admin-header h1 {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+  }
+
+  .admin-icon {
+    font-size: 48px;
+  }
+
+  .admin-subtitle {
+    color: var(--text-light);
+    font-size: 18px;
+  }
+
+  /* Formulario */
+  .form-section {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px var(--shadow);
+    margin-bottom: 40px;
+  }
+
+  .form-section h2 {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: var(--text);
+  }
+
+  .product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .btn-submit {
+    flex: 1;
+  }
+
+  .btn-cancel {
+    background: var(--text-light);
+  }
+
+  .btn-cancel:hover {
+    background: #5a6268;
+  }
+
+  /* Tabla */
+  .table-section {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .table-header h2 {
+    font-size: 24px;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .product-count {
+    background: var(--primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .products-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .products-table thead {
+    background: var(--bg);
+  }
+
+  .products-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .products-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .products-table tbody tr:hover {
+    background: var(--bg);
+  }
+
+  .product-name {
+    font-weight: 600;
+  }
+
+  .product-desc {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-light);
+  }
+
+  .product-price {
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .stock-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .stock-ok {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .stock-low {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .actions-cell {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-action {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    background: var(--bg);
+  }
+
+  .btn-action:hover {
+    transform: scale(1.1);
+  }
+
+  .btn-edit:hover {
+    background: #fff3cd;
+  }
+
+  .btn-delete:hover {
+    background: #f8d7da;
+  }
+
+  .empty-row {
+    text-align: center;
+    padding: 60px 20px !important;
+  }
+
+  .empty-state-small {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .empty-state-small span {
+    font-size: 48px;
+  }
+
+  .empty-state-small p {
+    color: var(--text-light);
+    font-size: 16px;
+  }
+
+  @media (max-width: 968px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .table-section {
+      padding: 20px;
+    }
+
+    .products-table {
+      font-size: 14px;
+    }
+
+    .products-table th,
+    .products-table td {
+      padding: 10px 8px;
+    }
+
+    .product-desc {
+      max-width: 150px;
+    }
+  }
+</style>
+
+<script>
+  import { ProductoService } from '../../services/api';
+  import type { Producto } from '../../types/producto';
+
+  // Referencias del DOM
+  const form = document.getElementById('product-form') as HTMLFormElement;
+  const formTitle = document.getElementById('form-title') as HTMLHeadingElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const cancelBtn = document.getElementById('cancel-btn') as HTMLButtonElement;
+  const productIdInput = document.getElementById('product-id') as HTMLInputElement;
+  const tbody = document.getElementById('products-tbody') as HTMLTableSectionElement;
+  const productCount = document.getElementById('product-count') as HTMLSpanElement;
+
+  let editMode = false;
+
+  // Función para mostrar notificación
+  function showNotification(message: string, type: 'success' | 'error') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+      background: ${type === 'success' ? '#d4edda' : '#f8d7da'};
+      color: ${type === 'success' ? '#155724' : '#721c24'};
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  // Cargar productos en la tabla
+  async function loadProducts() {
+    try {
+      const productos = await ProductoService.getAll();
+      renderProducts(productos);
+      productCount.textContent = `${productos.length} productos`;
+    } catch (error) {
+      showNotification('Error al cargar productos', 'error');
+      console.error(error);
+    }
+  }
+
+  // Renderizar productos en la tabla
+  function renderProducts(productos: Producto[]) {
+    if (productos.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-row">
+            <div class="empty-state-small">
+              <span>📭</span>
+              <p>No hay productos registrados</p>
+            </div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = productos.map(producto => `
+      <tr data-id="${producto.idProductos}">
+        <td>${producto.idProductos}</td>
+        <td class="product-name">${producto.nombre}</td>
+        <td class="product-desc">${producto.descripcion}</td>
+        <td class="product-price">$${producto.precio.toFixed(2)}</td>
+        <td>
+          <span class="stock-badge ${producto.catidades < 10 ? 'stock-low' : 'stock-ok'}">
+            ${producto.catidades}
+          </span>
+        </td>
+        <td class="actions-cell">
+          <button class="btn-action btn-edit" data-id="${producto.idProductos}" title="Editar">
+            ✏️
+          </button>
+          <button class="btn-action btn-delete" data-id="${producto.idProductos}" title="Eliminar">
+            🗑️
+          </button>
+        </td>
+      </tr>
+    `).join('');
+
+    attachEventListeners();
+  }
+
+  // Adjuntar eventos a botones
+  function attachEventListeners() {
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.addEventListener('click', handleEdit);
+    });
+
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', handleDelete);
+    });
+  }
+
+  // Manejar envío del formulario
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    const producto = {
+      nombre: formData.get('nombre') as string,
+      descripcion: formData.get('descripcion') as string,
+      precio: parseFloat(formData.get('precio') as string),
+      catidades: parseInt(formData.get('catidades') as string)
+    };
+
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Guardando...';
+
+      if (editMode) {
+        const id = parseInt(productIdInput.value);
+        await ProductoService.update(id, { ...producto, idProductos: id });
+        showNotification('✅ Producto actualizado correctamente', 'success');
+      } else {
+        await ProductoService.create(producto);
+        showNotification('✅ Producto creado correctamente', 'success');
+      }
+
+      resetForm();
+      await loadProducts();
+    } catch (error) {
+      showNotification('❌ Error al guardar el producto', 'error');
+      console.error(error);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = editMode ? '💾 Actualizar Producto' : '💾 Guardar Producto';
+    }
+  });
+
+  // Manejar edición
+  async function handleEdit(e: Event) {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const id = parseInt(btn.dataset.id!);
+    
+    try {
+      const producto = await ProductoService.getById(id);
+      if (!producto) return;
+
+      editMode = true;
+      productIdInput.value = producto.idProductos.toString();
+      (document.getElementById('nombre') as HTMLInputElement).value = producto.nombre;
+      (document.getElementById('descripcion') as HTMLTextAreaElement).value = producto.descripcion;
+      (document.getElementById('precio') as HTMLInputElement).value = producto.precio.toString();
+      (document.getElementById('catidades') as HTMLInputElement).value = producto.catidades.toString();
+
+      formTitle.textContent = '✏️ Editar Producto';
+      submitBtn.textContent = '💾 Actualizar Producto';
+      cancelBtn.style.display = 'block';
+
+      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (error) {
+      showNotification('Error al cargar el producto', 'error');
+      console.error(error);
+    }
+  }
+
+  // Manejar eliminación
+  async function handleDelete(e: Event) {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const id = parseInt(btn.dataset.id!);
+    
+    if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+
+    try {
+      await ProductoService.delete(id);
+      showNotification('✅ Producto eliminado correctamente', 'success');
+      await loadProducts();
+    } catch (error) {
+      showNotification('❌ Error al eliminar el producto', 'error');
+      console.error(error);
+    }
+  }
+
+  // Cancelar edición
+  cancelBtn.addEventListener('click', resetForm);
+
+  // Resetear formulario
+  function resetForm() {
+    form.reset();
+    editMode = false;
+    productIdInput.value = '';
+    formTitle.textContent = '➕ Agregar Nuevo Producto';
+    submitBtn.textContent = '💾 Guardar Producto';
+    cancelBtn.style.display = 'none';
+  }
+
+  // Adjuntar eventos iniciales
+  attachEventListeners();
+</script>
+
+<style is:global>
+  @keyframes slideIn {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+  }
+</style>

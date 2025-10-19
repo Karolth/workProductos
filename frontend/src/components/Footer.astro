@@ -1,0 +1,151 @@
+---
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3 class="footer-logo">
+          <span class="logo-icon">🛍️</span>
+          Productos
+        </h3>
+        <p class="footer-description">
+          Tu tienda de confianza para encontrar los mejores productos al mejor precio.
+        </p>
+      </div>
+
+      <div class="footer-section">
+        <h4>Enlaces Rápidos</h4>
+        <ul class="footer-links">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/#productos">Productos</a></li>
+          <li><a href="/admin">Admin</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contacto</h4>
+        <ul class="footer-contact">
+          <li>📧 info@productos.com</li>
+          <li>📱 +57 300 123 4567</li>
+          <li>📍 Cali, Colombia</li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Síguenos</h4>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook">📘</a>
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="#" aria-label="Twitter">🐦</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {new Date().getFullYear()} Productos. Todos los derechos reservados.</p>
+      <p class="tech-stack">Hecho con ❤️ usando Astro + Spring Boot</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+    color: var(--white);
+    padding: 60px 0 20px;
+    margin-top: 80px;
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+
+  .footer-section h3,
+  .footer-section h4 {
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+  }
+
+  .logo-icon {
+    font-size: 32px;
+  }
+
+  .footer-description {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+  }
+
+  .footer-links,
+  .footer-contact {
+    list-style: none;
+    padding: 0;
+  }
+
+  .footer-links li,
+  .footer-contact li {
+    margin-bottom: 10px;
+  }
+
+  .footer-links a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .footer-links a:hover {
+    color: var(--primary);
+  }
+
+  .footer-contact li {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .social-links {
+    display: flex;
+    gap: 15px;
+  }
+
+  .social-links a {
+    font-size: 28px;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+  }
+
+  .social-links a:hover {
+    transform: scale(1.2);
+  }
+
+  .footer-bottom {
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .footer-bottom p {
+    color: rgba(255, 255, 255, 0.6);
+    margin: 5px 0;
+    font-size: 14px;
+  }
+
+  .tech-stack {
+    font-size: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .footer-content {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+  }
+</style>
