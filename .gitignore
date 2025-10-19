@@ -37,3 +37,7 @@ frontend/dist/
 frontend/.astro/
 frontend/.env
 frontend/.DS_Store
+
+**/application-local.properties
+application-local.properties
+src/main/resources/application-local.properties
