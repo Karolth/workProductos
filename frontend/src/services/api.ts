@@ -3,7 +3,6 @@ import type { Producto } from '../types/producto';
 const API_BASE = 'http://localhost:8080';
 
 export const ProductoService = {
-  // Obtener todos los productos
   async getAll(): Promise<Producto[]> {
     try {
       const res = await fetch(`${API_BASE}/productos/api`);
@@ -15,7 +14,6 @@ export const ProductoService = {
     }
   },
 
-  // Obtener producto por ID
   async getById(id: number): Promise<Producto | null> {
     try {
       const res = await fetch(`${API_BASE}/productos/api/${id}`);
@@ -27,7 +25,6 @@ export const ProductoService = {
     }
   },
 
-  // Crear producto
   async create(producto: Omit<Producto, 'idProductos'>): Promise<Producto | null> {
     try {
       const res = await fetch(`${API_BASE}/productos/api`, {
@@ -43,7 +40,6 @@ export const ProductoService = {
     }
   },
 
-  // Actualizar producto
   async update(id: number, producto: Producto): Promise<Producto | null> {
     try {
       const res = await fetch(`${API_BASE}/productos/api/${id}`, {
@@ -59,7 +55,6 @@ export const ProductoService = {
     }
   },
 
-  // Eliminar producto
   async delete(id: number): Promise<boolean> {
     try {
       const res = await fetch(`${API_BASE}/productos/api/${id}`, {
@@ -72,7 +67,6 @@ export const ProductoService = {
     }
   },
 
-  // Endpoint de saludo de prueba
   async getSaludo(): Promise<string> {
     try {
       const res = await fetch(`${API_BASE}/api/saludo`);
