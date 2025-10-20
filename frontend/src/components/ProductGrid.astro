@@ -1,0 +1,115 @@
+---
+import type { Producto } from '../types/producto';
+import ProductCard from './ProductCard.astro';
+
+interface Props {
+  productos: Producto[];
+}
+
+const { productos } = Astro.props;
+---
+
+<section class="products-section" id="productos">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="title-icon">🛍️</span>
+        Nuestros Productos
+      </h2>
+      <p class="section-subtitle">
+        Explora nuestra selección de productos de alta calidad
+      </p>
+    </div>
+
+    {productos.length === 0 ? (
+      <div class="empty-state">
+        <span class="empty-icon">📭</span>
+        <h3>No hay productos disponibles</h3>
+        <p>Agrega productos desde el panel de administración</p>
+        <a href="/admin" class="btn">Ir al Panel Admin</a>
+      </div>
+    ) : (
+      <div class="products-grid">
+        {productos.map((producto) => (
+          <ProductCard producto={producto} />
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .products-section {
+    padding: 80px 0;
+    background: var(--bg);
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-title {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .title-icon {
+    font-size: 48px;
+  }
+
+  .section-subtitle {
+    font-size: 18px;
+    color: var(--text-light);
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  .empty-icon {
+    font-size: 80px;
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  .empty-state h3 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+
+  .empty-state p {
+    color: var(--text-light);
+    margin-bottom: 30px;
+    font-size: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .section-title {
+      font-size: 32px;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .products-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
